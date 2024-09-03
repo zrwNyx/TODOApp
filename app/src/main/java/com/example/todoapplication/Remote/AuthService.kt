@@ -1,44 +1,51 @@
 package com.example.todoapplication.Remote
 
-import android.util.Log
+import com.example.todoapplication.Model.LoginCredentials
+import com.example.todoapplication.Model.RefreshTokenRequest
+import com.example.todoapplication.Model.RefreshTokenResponse
 import com.example.todoapplication.Model.Todo
-import com.example.todoapplication.Model.TodoX
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.call.receive
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.utils.EmptyContent.contentType
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
+import com.example.todoapplication.Model.TodoCom
+import com.example.todoapplication.Model.TodoResponse
+import com.example.todoapplication.Model.UserResponse
+import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 
-object AuthService {
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
-    private val client = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            json(json)
-        }
-    }
+interface TodoApiService {
 
-    suspend fun getToDo() : List<TodoX>{
-        try {
-            val response: HttpResponse = client.get("https://dummyjson.com/todos")
-            val todos = response.body<List<TodoX>>()
-            return todos
-        } catch (e: Exception) {
-            println("Error: ${e.message}")
-            return emptyList()
-        } finally {
-            client.close()
-        }
-    }
+    // Todo endpoints
+    @GET("todos")
+    fun getTodos(): Call<TodoResponse>
 
+    @GET("todos/user/{userId}")
+    fun getTodosByUserId(@Path("userId") userId: Int): Call<TodoResponse>
+
+    @POST("todos/add")
+    fun addTodo(@Body todo: Todo): Call<Todo>
+
+    @PUT("todos/{id}")
+    fun updateTodo(
+        @Path("id") id: Int,
+        @Body todo: TodoCom
+    ): Call<Todo>
+
+    @DELETE("todos/{id}")
+    fun deleteTodo(@Path("id") id: Int): Call<Todo>
+
+    // Authentication endpoints
+    @POST("auth/login")
+    fun login(@Body credentials: LoginCredentials): Call<UserResponse>
+
+    @GET("auth/me")
+    fun getCurrentUser(@Header("Authorization") authHeader: String): Call<UserResponse>
+
+    @POST("auth/refresh")
+    fun refreshToken(@Body refreshTokenRequest: RefreshTokenRequest): Call<RefreshTokenResponse>
 }
+
+data class LoginCredentials(val username: String, val password: String, val expiresInMins: Int = 30)

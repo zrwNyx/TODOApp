@@ -6,8 +6,9 @@ import androidx.lifecycle.ViewModel
 
 class ProfileViewModel : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is dashboard Fragment"
+    val name: MutableLiveData<String> = MutableLiveData()
+
+    fun putName(x: String){
+        name.value = x
     }
-    val text: LiveData<String> = _text
 }

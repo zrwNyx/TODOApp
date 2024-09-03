@@ -1,17 +1,20 @@
 package com.example.todoapplication.Model
 
-
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class Todo(
-    @SerialName("limit")
-    val limit: Int?,
-    @SerialName("skip")
-    val skip: Int?,
-    @SerialName("todos")
-    val todos: List<TodoX>?,
-    @SerialName("total")
-    val total: Int?
+    val id: Int,
+    val todo: String,
+    val completed: Boolean,
+    val userId: Int
 )
+
+data class TodoCom(
+    val completed: Boolean
+)
+
+data class TodoResponse(
+    val todos: List<Todo>,
+    val total: Int,
+    val skip: Int,
+    val limit: Int
+)
+
